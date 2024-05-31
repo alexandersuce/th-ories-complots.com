@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h1 {
+    color: #333;
+    animation: blink 1s infinite;
+}
+
+.write-button {
+    display: flex;
+    align-items: center;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.write-button img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.write-button:hover {
+    background-color: #0056b3;
+}
+
+.ilu {
+    width: 100px;
+    animation: spin 4s linear infinite, move 10s linear infinite;
+    position: absolute;
+}
+
+.content {
+    margin-top: 200px;
+    text-align: left;
+}
+
+.content h2 {
+    color: #444;
+}
+
+.content p {
+    color: #666;
+}
+
+.content-image {
+    width: 150px;
+    display: block;
+    margin: 10px auto;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes move {
+    0% {
+        left: 0;
+    }
+    50% {
+        left: calc(100% - 100px); /* Ajuste cette valeur selon la taille de l'image */
+    }
+    100% {
+        left: 0;
+    }
+}
+
+@keyframes blink {
+    0%,
+    100% {
+        color: red;
+    }
+    50% {
+        color: #333;
+    }
+}

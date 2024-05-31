@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partager un moment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            animation: blink 1s infinite;
+        }
+
+        .home-icon {
+            font-size: 24px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .article-form, .articles-list {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .article-form input, .article-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.1);
+        }
+
+        .article {
+            background-color: #fafafa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            text-align: left;
+            position: relative;
+            animation: float 2s infinite;
+        }
+
+        .article img {
+            max-width: 100px;
+            margin-right: 10px;
+            vertical-align: middle;
+            animation: spin 5s linear infinite;
+        }
+
+        .article-content {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .article-author {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .article-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        @keyframes blink {
+            0%, 100% { color: #333; }
+            50% { color: #ff0000; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Partager un moment</h1>
+        <a href="index.html" class="home-icon"><i class="fas fa-home"></i></a>
+    </header>
+    <main>
+        <section class="article-form">
+            <h2>Écrire un article</h2>
+            <form id="articleForm">
+                <input type="text" id="authorName" placeholder="Nom de l'auteur" required>
+                <textarea id="articleContent" placeholder="Écrivez votre article ici..." rows="5" required></textarea>
+                <input type="url" id="imageUrl" placeholder="Lien de l'image (optionnel)">
+                <input type="file" id="imageFile" accept="image/*">
+                <button type="submit">Publier</button>
+            </form>
+        </section>
+        <section class="articles-list">
+            <h2>Articles publiés</h2>
+            <div id="articlesContainer"></div>
+        </section>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const articleForm = document.getElementById('articleForm');
+            const authorName = document.getElementById('authorName');
+            const articleContent = document.getElementById('articleContent');
+            const imageUrl = document.getElementById('imageUrl');
+            const imageFile = document.getElementById('imageFile');
+            const articlesContainer = document.getElementById('articlesContainer');
+
+            // Load articles from localStorage
+            const loadArticles = () => {
+                const articles = JSON.parse(localStorage.getItem('articles')) || [];
+                articlesContainer.innerHTML = '';
+                articles.forEach((article, index) => {
+                    const articleElement = document.createElement('div');
+                    articleElement.className = 'article';
+
+                    if (article.image) {
+                        const img = document.createElement('img');
+                        img.src = article.image;
+                        articleElement.appendChild(img);
+                    }
+
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'article-content';
+
+                    const authorElement = document.createElement('div');
+                    authorElement.className = 'article-author';
+                    authorElement.textContent = article.author;
+                    contentDiv.appendChild(authorElement);
+
+                    const textElement = document.createElement('div');
+                    textElement.className = 'article-text';
+                    textElement.textContent = article.content;
+                    contentDiv.appendChild(textElement);
+
+                    const buttonsDiv = document.createElement('div');
+                    buttonsDiv.className = 'article-buttons';
+
+                    const shareButton = document.createElement('button');
+                    shareButton.textContent = 'Partager';
+                    shareButton.addEventListener('click', () => {
+                        navigator.share({
+                            title: article.author,
+                            text: article.content,
+                            url: window.location.href
+                        });
+                    });
+                    buttonsDiv.appendChild(shareButton);
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Supprimer';
+                    deleteButton.addEventListener('click', () => {
+                        deleteArticle(index);
+                    });
+                    buttonsDiv.appendChild(deleteButton);
+
+                    articleElement.appendChild(buttonsDiv);
+                    articleElement.appendChild(contentDiv);
+                    articlesContainer.appendChild(articleElement);
+                });
+            };
+
+            // Save article to localStorage
+            const saveArticle = (article) => {
+                const articles = JSON.parse(localStorage.getItem('articles')) || [];
+                articles.push(article);
+                localStorage.setItem('articles', JSON.stringify(articles));
+                loadArticles();
+            };
+
+            // Delete article from localStorage
+            const deleteArticle = (index) => {
+                const articles = JSON.parse(localStorage.getItem('articles')) || [];
+                articles.splice(index, 1);
+                localStorage.setItem('articles', JSON.stringify(articles));
+                loadArticles();
+            };
+
+            // Handle form submission
+            articleForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const articleText = articleContent.value.trim();
+                const author = authorName.value.trim();
+                let image = imageUrl.value.trim();
+
+                if (articleText && author) {
+                    if (imageFile.files.length > 0) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            image = event.target.result;
+                            saveArticle({ author, content: articleText, image });
+                        };
+                        reader.readAsDataURL(imageFile.files[0]);
+                    } else {
+                        saveArticle({ author, content: articleText, image });
+                    }
+                    articleContent.value = '';
+                    authorName.value = '';
+                    imageUrl.value = '';
+                    imageFile.value = '';
+                }
+            });
+
+            // Initial load
+            loadArticles();
+        });
+    </script>
+</body>
+</html>
